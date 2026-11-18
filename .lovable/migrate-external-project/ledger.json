@@ -1,0 +1,10 @@
+[
+ {"capability":"code","source":"GitHub morsel-and-meetup-market (/, /menu, /dashboard, /auth, Şans Çarkı, photo route, cark.html)","outcome":"copy","status":"verified","next_action":"none"},
+ {"capability":"schema","source":"menu_categories, menu_items, menu_reviews, guest_comments, wheel_settings, wheel_wins, spin_wheel()","outcome":"migrate","status":"verified","next_action":"none"},
+ {"capability":"records","source":"Default menu + wheel seeded by migration; live edits/comments in old database not exported","outcome":"migrate","status":"pending","next_action":"Ask user for CSV exports or skip"},
+ {"capability":"auth","source":"None (passwordless dashboard)","outcome":"not needed","status":"accepted","next_action":"none"},
+ {"capability":"authorization","source":"Public RLS on menu tables (owner-requested)","outcome":"migrate","status":"verified","next_action":"none"},
+ {"capability":"file storage","source":"Private menu-photos bucket","outcome":"migrate","status":"partial","next_action":"Bucket ready; old uploaded photos must be re-uploaded"},
+ {"capability":"QR cutover","source":"QR hidden in editor until this project is published","outcome":"cutover","status":"pending","next_action":"Set publishedMenuUrl to <published>/menu after publish"},
+ {"capability":"verification","source":"-","outcome":"verify","status":"verified","next_action":"none"}
+]
