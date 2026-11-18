@@ -32,8 +32,8 @@ export const getMenu = createServerFn({ method: "GET" }).handler(async () => {
 
 // Management is intentionally public at the owner's request. The publishable
 // client can access only the menu tables allowed by their explicit RLS policies.
-export const getDashboard = createServerFn({ method: "GET" }).handler(async () => {
-  const client = createMenuClient(process.env['SUPABASE_URL'], process.env['SUPABASE_PUBLISHABLE_KEY']);
+export const getDashboard = createServerFn({ method: "GET" }).middleware([managementDb]).handler(async ({ context }) => {
+  const client = context.db;
   const [categories, items] = await Promise.all([
     client.from("menu_categories").select("*").order("position"),
     client.from("menu_items").select("*").order("position"),
@@ -42,28 +42,28 @@ export const getDashboard = createServerFn({ method: "GET" }).handler(async () =
   return { categories: categories.data ?? [], items: items.data ?? [] };
 });
 
-export const saveItem = createServerFn({ method: "POST" }).inputValidator((input) => itemSchema.parse(input)).handler(async ({ data }) => {
-  const client = createMenuClient(process.env['SUPABASE_URL'], process.env['SUPABASE_PUBLISHABLE_KEY']);
+export const saveItem = createServerFn({ method: "POST" }).middleware([managementDb]).inputValidator((input) => itemSchema.parse(input)).handler(async ({ data, context }) => {
+  const client = context.db;
   const { id, ...values } = data;
   const result = id ? await client.from("menu_items").update(values).eq("id", id).select("id").single() : await client.from("menu_items").insert(values).select("id").single();
   if (result.error) throw new Error("Ürün kaydedilemedi.");
   return result.data;
 });
-export const saveCategory = createServerFn({ method: "POST" }).inputValidator((input) => categorySchema.parse(input)).handler(async ({ data }) => {
-  const client = createMenuClient(process.env['SUPABASE_URL'], process.env['SUPABASE_PUBLISHABLE_KEY']);
+export const saveCategory = createServerFn({ method: "POST" }).middleware([managementDb]).inputValidator((input) => categorySchema.parse(input)).handler(async ({ data, context }) => {
+  const client = context.db;
   const { id, ...values } = data;
   const result = id ? await client.from("menu_categories").update(values).eq("id", id).select("id").single() : await client.from("menu_categories").insert(values).select("id").single();
   if (result.error) throw new Error("Kategori kaydedilemedi.");
   return result.data;
 });
-export const deleteEntry = createServerFn({ method: "POST" }).inputValidator((input) => z.object({ id: z.string().min(1), kind: z.enum(["item", "category"]) }).parse(input)).handler(async ({ data }) => {
-  const client = createMenuClient(process.env['SUPABASE_URL'], process.env['SUPABASE_PUBLISHABLE_KEY']);
+export const deleteEntry = createServerFn({ method: "POST" }).middleware([managementDb]).inputValidator((input) => z.object({ id: z.string().min(1), kind: z.enum(["item", "category"]) }).parse(input)).handler(async ({ data, context }) => {
+  const client = context.db;
   const result = await client.from(data.kind === "item" ? "menu_items" : "menu_categories").delete().eq("id", data.id).select("id").single();
   if (result.error) throw new Error(data.kind === "category" ? "Önce bu kategorideki ürünleri taşıyın veya silin." : "Ürün silinemedi.");
   return { ok: true };
 });
-export const setItemAvailability = createServerFn({ method: "POST" }).inputValidator((input) => z.object({ id: z.string().min(1), available: z.boolean() }).parse(input)).handler(async ({ data }) => {
-  const client = createMenuClient(process.env['SUPABASE_URL'], process.env['SUPABASE_PUBLISHABLE_KEY']);
+export const setItemAvailability = createServerFn({ method: "POST" }).middleware([managementDb]).inputValidator((input) => z.object({ id: z.string().min(1), available: z.boolean() }).parse(input)).handler(async ({ data, context }) => {
+  const client = context.db;
   const result = await client.from("menu_items").update({ available: data.available }).eq("id", data.id).select("id, available").single();
   if (result.error) throw new Error("Ürün durumu değiştirilemedi.");
   return result.data;

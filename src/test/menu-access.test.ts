@@ -18,7 +18,10 @@ vi.mock("@tanstack/react-start", () => ({
     const builder = {
       middleware: () => builder,
       inputValidator: (validator: typeof validate) => { validate = validator; return builder; },
-      handler: (handler: (input: { data: unknown }) => unknown) => (input?: { data: unknown }) => handler({ data: validate(input?.data) }),
+      handler: (handler: (input: { data: unknown; context: unknown }) => unknown) => async (input?: { data: unknown }) => {
+        const { createClient } = await import("@supabase/supabase-js");
+        return handler({ data: validate(input?.data), context: { db: (createClient as unknown as () => unknown)() } });
+      },
     };
     return builder;
   },
