@@ -3,8 +3,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { menuQuery } from "@/lib/menu-queries";
 import { menuImage } from "@/lib/menu-images";
 import { useMemo, useState } from "react";
-import { Coffee, FerrisWheel, Heart, Search, SlidersHorizontal } from "lucide-react";
+import { FerrisWheel, Heart, Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoAsset from "@/assets/ummasbun-coffee-logo.jpeg.asset.json";
 import { ProductSheet } from "@/components/menu/ProductSheet";
 import { CommentBox } from "@/components/menu/CommentBox";
 import { GuestWheel } from "@/components/menu/GuestWheel";
@@ -60,9 +61,13 @@ function Menu() {
     <main className="mx-auto min-h-screen w-full max-w-lg px-4 pb-10">
       <header className="relative -mx-4 flex h-44 items-center justify-center rounded-b-3xl bg-cream">
         <Button type="button" variant="secondary" size="icon" onClick={() => setWheel(true)} aria-label="Şans Çarkı" title="Şans Çarkı" className="absolute left-4 top-4 size-11 rounded-full [&_svg]:size-6"><FerrisWheel strokeWidth={1.75} /></Button>
-        <div className="flex h-16 w-16 items-center justify-center rounded-full border border-cream-foreground/50 text-cream-foreground">
-          <Coffee className="h-8 w-8" strokeWidth={1.25} />
-        </div>
+        <img
+          src={logoAsset.url}
+          alt="Ummasbun Coffee"
+          width={1024}
+          height={398}
+          className="h-24 w-auto max-w-full rounded-2xl object-contain"
+        />
       </header>
 
       <CommentBox />
